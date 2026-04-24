@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+pandas
+numpy
+yfinance
+apscheduler
+pydantic
+python-dotenv
+requests
+scikit-learn
+statsmodels
+aiohttp
+python-multipart
+psycopg2-binary
