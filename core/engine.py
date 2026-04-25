@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from database.db import SessionLocal, Trade, Portfolio, PortfolioHistory, Config, ModelMetrics
 from agents.trading_agents import ScannerAgent, AnalystAgent, RiskAgent, AllocatorAgent, ExecutionAgent, SellAgent, LearningAgent
+from utils.notifier import TelegramNotifier
 import yfinance as yf
 
 class TradingEngine:
@@ -13,6 +14,7 @@ class TradingEngine:
         self.execution = ExecutionAgent()
         self.sell_engine = SellAgent()
         self.learner = LearningAgent()
+        self.notifier = TelegramNotifier()
         self.is_running = False
 
     async def run_cycle(self):
