@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.db import SessionLocal, init_db, Trade, Portfolio, PortfolioHistory, Config, ModelMetrics
 from core.engine import TradingEngine
 import asyncio
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import datetime
 
 app = FastAPI(title="SimTrade AI API")
@@ -19,7 +19,7 @@ app.add_middleware(
 
 # Global Trading Engine
 engine = TradingEngine()
-scheduler = BackgroundScheduler()
+scheduler = AsyncIOScheduler()
 
 def get_db():
     db = SessionLocal()
@@ -34,6 +34,10 @@ async def startup_event():
     # Add trading cycle to scheduler
     scheduler.add_job(engine.run_cycle, 'interval', minutes=5, id='trading_job')
     scheduler.start()
+@app.post("/api/run-cycle")
+async def run_manual_cycle():
+    await engine.run_cycle()
+    return {"message": "Cycle triggered manually"}
 
 @app.get("/api/system")
 def get_system_status():
