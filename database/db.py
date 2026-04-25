@@ -83,12 +83,29 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    # Check if config exists, if not create default
-    if not db.query(Config).first():
-        default_config = Config()
-        db.add(default_config)
-    if not db.query(Portfolio).first():
-        default_portfolio = Portfolio()
-        db.add(default_portfolio)
-    db.commit()
-    db.close()
+    try:
+        # Ensure default Config exists
+        if not db.query(Config).first():
+            db.add(Config(
+                initial_capital=100000.0,
+                max_trades=10,
+                max_exposure=0.2,
+                stop_loss_pct=0.02,
+                take_profit_pct=0.05
+            ))
+        
+        # Ensure default Portfolio exists
+        if not db.query(Portfolio).first():
+            db.add(Portfolio(
+                cash_balance=100000.0,
+                total_value=100000.0,
+                total_pnl=0.0,
+                active_positions_count=0
+            ))
+        
+        db.commit()
+    except Exception as e:
+        print(f"Error during DB initialization: {e}")
+        db.rollback()
+    finally:
+        db.close()
